@@ -1,2 +1,2 @@
 # py-sync
-Python package prividing abstract layer for any ORM to synchronize local models. 
+Python package providing abstract layer for any ORM to synchronize local models. 
