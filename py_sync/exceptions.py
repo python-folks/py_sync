@@ -1,0 +1,3 @@
+
+class PySyncException(Exception):
+    pass 
