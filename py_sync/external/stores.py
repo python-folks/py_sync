@@ -1,9 +1,10 @@
 from abc import ABC
+from rx import Observable, operators
 
 from py_sync.config import config
 from .resources import ExternalResource
 
-class ExternalSourceBase(ABC):
+class StoreBase(ABC):
 
     id_register = set()
     serializer = config.DEFAULT_SERIALIZER_CLASS()
@@ -13,13 +14,13 @@ class ExternalSourceBase(ABC):
         self.schema = schema
         if discriminator in self.id_register:
             raise ValueError(
-                f'The id {discriminator} is already in use by other ExternalSource.'
+                f'The id {discriminator} is already in use by other Store.'
             )
         else:
             self.discriminator = discriminator
             self.id_register.add(discriminator)
 
-    def _bind_ExternalResource(self, obj):
+    def _to_ExternalResource(self, obj):
         external_id = self.extract_external_id(obj)
         local_data = self.to_local_data(obj)
         return ExternalResource(external_id, self, local_data)
@@ -36,14 +37,16 @@ class ExternalSourceBase(ABC):
     def extract_external_id(self, obj):
         raise NotImplementedError()
 
-    def count_external_objects(self):
+    def count_external_objects(self) -> int:
         raise NotImplementedError()
 
-    def all_external_objects(self):
+    def external_objects(self) -> Observable:
         raise NotImplementedError()
 
-    def all_external_resources(self):
-        return map(self._bind_ExternalResource, self.all_external_objects())
+    def external_resources(self) -> Observable:
+        return self.external_objects().pipe(
+            operators.map(self._to_ExternalResource)
+        )
 
     def __repr__(self):
         return f'<{self.__class__.__name__}/{self.discriminator}/@{self.source_url}>'

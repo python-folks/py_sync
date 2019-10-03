@@ -1,7 +1,7 @@
 from  py_sync.config import config
 
 from .trackers import ResourceTrackerBase
-from .sources import ExternalSourceBase
+from .stores import StoreBase
 
 class ExternalResource:
 
@@ -11,7 +11,7 @@ class ExternalResource:
         self.external_id = external_id
         self.data = local_data
         self.source = None
-        if isinstance(source, ExternalSourceBase):
+        if isinstance(source, StoreBase):
             self.source = source
         self.tracker = None
         if isinstance(self.tracker_class, ResourceTrackerBase):
