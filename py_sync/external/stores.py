@@ -23,7 +23,7 @@ class StoreBase(ABC):
     def _to_ExternalResource(self, obj):
         external_id = self.extract_external_id(obj)
         local_data = self.to_local_data(obj)
-        return ExternalResource(external_id, self, local_data)
+        return ExternalResource.from_remote(self, external_id, local_data)
 
     def resource_url(self, resource):
         raise NotImplementedError()
@@ -33,6 +33,10 @@ class StoreBase(ABC):
         if self.schema is not None:
             self.schema.validate(local_data)
         return local_data
+
+    def to_remote_data(self, obj):
+        remote_data = self.serializer.dump(obj)
+        return remote_data
 
     def extract_external_id(self, obj):
         raise NotImplementedError()

@@ -6,12 +6,27 @@ from py_sync.warnings import DummyImplementationInUse
 
 class ResourceTrackerBase(ABC):
 
-    def __init__(self, source, remote_id, *args, **kwargs):
-        self.source = source
-        self.remote_id = remote_id
+    def __init__(self, store_discriminator, *args, **kwargs):
+        self.store_discriminator = store_discriminator
+        self._remote_id = kwargs.get('remote_id', None)
+        self._local_id = kwargs.get('local_id', None)
 
-    local_id = property(get_local_id)
+    @property
+    def local_id(self):
+        if self._local_id is None:
+            return self.get_local_id()
+        return self._local_id
+
     def get_local_id(self):
+        raise NotImplementedError()
+
+    @property
+    def remote_id(self):
+        if self._remote_id is None:
+            return self.get_remote_id()
+        return self._remote_id
+
+    def get_remote_id(self):
         raise NotImplementedError()
 
 
